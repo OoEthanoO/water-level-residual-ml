@@ -1,26 +1,177 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+
+  --bg: #f6f8fa;
+  --bg-deep: #eaeff4;
+  --surface: #ffffff;
+  --surface-2: #f2f6f9;
+  --border: #d9e2ea;
+  --border-strong: #c2d0dc;
+
+  --ink: #0d1b26;
+  --ink-2: #33495b;
+  --muted: #64798a;
+
+  --accent: #0e7490;
+  --accent-2: #0891b2;
+  --accent-soft: #e0f2fe;
+  --baseline: #b45309;
+  --baseline-soft: #fef3c7;
+
+  --grid: rgba(14, 116, 144, 0.07);
+}
+
+.dark {
+  color-scheme: dark;
+
+  --bg: #050e15;
+  --bg-deep: #030a10;
+  --surface: #0b1922;
+  --surface-2: #10222e;
+  --border: #1b3240;
+  --border-strong: #27455a;
+
+  --ink: #e8f1f7;
+  --ink-2: #b7cbd9;
+  --muted: #7f9bad;
+
+  --accent: #22d3ee;
+  --accent-2: #67e8f9;
+  --accent-soft: rgba(34, 211, 238, 0.12);
+  --baseline: #fbbf24;
+  --baseline-soft: rgba(251, 191, 36, 0.12);
+
+  --grid: rgba(34, 211, 238, 0.06);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-bg-deep: var(--bg-deep);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border-base: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-accent-soft: var(--accent-soft);
+  --color-baseline: var(--baseline);
+  --color-baseline-soft: var(--baseline-soft);
+
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-serif-display);
+  --font-mono: var(--font-mono-code);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+/* Subtle bathymetric contour texture for the hero */
+.contour-field {
+  background-image: repeating-radial-gradient(
+    circle at 78% 18%,
+    transparent 0,
+    transparent 46px,
+    var(--grid) 46px,
+    var(--grid) 47px
+  );
+}
+
+.rule-gradient {
+  background: linear-gradient(
+    90deg,
+    var(--accent) 0%,
+    color-mix(in srgb, var(--accent) 25%, transparent) 45%,
+    transparent 100%
+  );
+}
+
+/* Prose defaults for paper body copy */
+.paper-prose p {
+  color: var(--ink-2);
+  line-height: 1.78;
+  font-size: 1.0625rem;
+  margin-bottom: 1.15rem;
+  text-wrap: pretty;
+}
+
+.paper-prose p:last-child {
+  margin-bottom: 0;
+}
+
+.paper-prose strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.num {
+  font-family: var(--font-mono-code), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+.bar-grow {
+  animation: bar-grow 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes bar-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.fade-up {
+  animation: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }

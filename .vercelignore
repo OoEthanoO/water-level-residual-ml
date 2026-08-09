@@ -1,0 +1,4 @@
+# Cloned research repo (~485 MB of DEM rasters, CSVs, and model artifacts).
+# The figures it produced already live in public/figures/, so none of this
+# is needed to build or serve the site.
+ccir-final

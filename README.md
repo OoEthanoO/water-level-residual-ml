@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Water Level Residual Correction — paper site
 
-## Getting Started
+A Next.js presentation site for:
 
-First, run the development server:
+**A Machine Learning Approach for Water Level Residual Correction Using Geospatial Terrain Features**
+Yan (Ethan) Xu — *The Columbia Junior Science Journal*, Volume 11, 2025–2026, pp. 1–6.
+
+Published issue: <https://cjsjournal.squarespace.com/20252026-cjsj>
+
+## Running it
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```bash
+npm run build && npm start
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Path | Purpose |
+| --- | --- |
+| `src/lib/paper.ts` | All paper content — abstract, section prose, features, metrics, figure metadata, references. Edit text here, not in components. |
+| `src/app/page.tsx` | Page composition and section order. |
+| `src/components/` | Presentational pieces (hero, TOC, figure cards, result charts, citation box). |
+| `public/figures/` | Figures 1–6, extracted from the published PDF. |
+| `public/xu-*.pdf` | The full published PDF, linked from the header and hero. |
 
-## Learn More
+## Notes on the figures
 
-To learn more about Next.js, take a look at the following resources:
+Figures 1–6 are the original matplotlib outputs from the `ccir-final` research
+repo (711–1035 px wide), not the low-resolution rasters embedded in the PDF.
+Each was matched to its published counterpart by plot title and curve shape.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Figure 6 was **regenerated**, because it is not saved anywhere in the research
+repo. The cause is a filename collision: `model/validate_xgb_performance.py`
+(one-step-ahead, Figure 4) and `model/validate_xgb_prediction.py`
+(autoregressive, Figure 6) both write to
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+performances/prediction_{model_name}_on_{data_name}.png
+```
 
-## Deploy on Vercel
+so whichever runs last silently overwrites the other. To reproduce Figure 6:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+python model/validate_xgb_prediction.py --model models/xgb_elevation_<15-stations>_20210820_20250819.json --data model_data/noaa_9411340_20250822_20250823_observed.csv
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The regenerated figure reproduces the paper's reported autoregressive RMSE of
+**0.0763 m** exactly. Requires `xgboost`, `rasterio`, `pandas`, `matplotlib`,
+`scikit-learn`, and the `libomp` runtime (`brew install libomp` on macOS).
+
+To swap any figure, drop a new PNG into `public/figures/` under the same
+filename and update its `width` / `height` in `src/lib/paper.ts`.
+
+## Theming
+
+Light and dark themes are driven by CSS custom properties in
+`src/app/globals.css`. A small pre-hydration script in `src/app/layout.tsx`
+applies the stored or system preference before first paint, so there is no
+flash. Accent (`--accent`) marks the geospatial XGBoost model throughout;
+amber (`--baseline`) marks the temporal LightGBM baseline.
