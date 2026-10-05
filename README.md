@@ -13,9 +13,47 @@ Published issue: <https://cjsjournal.squarespace.com/20252026-cjsj>
 npm run dev
 ```
 
-```bash
-npm run build && npm start
+`npm run build` exports the site to `out/`. Serve that directory with a static
+web server; this site does not require `next start` or a production Node process.
+
+## Deployment
+
+Production: <https://tides.ethanyanxu.com>, served by the existing Caddy instance
+on the native Windows home server `finprint-host`.
+
+From a Windows machine with SSH access to that host, install dependencies with
+`npm ci`, commit the changes, then run:
+
+```powershell
+npm run deploy
 ```
+
+The deploy command requires a clean working tree, runs lint and the production
+build (including TypeScript), uploads only the static export, and activates a
+new release under `C:\ProgramData\water-level-residual-ml`. It validates Caddy
+before reloading and confirms the commit at `/version.txt` through trusted
+HTTPS, both on the host and through public DNS. A failed activation restores
+the previous Caddy configuration. Releases are retained for rollback:
+
+```powershell
+npm run deploy -- -Rollback
+```
+
+The host's `state.json` records the active and previous releases. The site's
+own `Caddyfile` is imported from the shared Finprint Caddy configuration;
+`finprint-caddy` already starts at boot. No additional service is needed.
+Figures, fonts, and the paper PDF are all served locally, with long caching
+only for content-hashed assets. The paper content and canonical URL are unchanged.
+
+DNS is a Cloudflare DNS-only CNAME from `tides.ethanyanxu.com` to
+`finprint.ethanyanxu.com`, so the existing home-server DDNS updater handles IP
+changes. The original DNS record is backed up on the host as
+`dns-before-migration.json`. Credentials remain on the host. Caddy obtains and
+renews HTTPS certificates automatically. Initial setup requires this DNS
+record to point at the home server before certificate validation can complete.
+
+`vercel.json` disables Vercel Git deployments. Future releases use the command
+above; pushing to GitHub alone does not deploy the site.
 
 ## Structure
 
